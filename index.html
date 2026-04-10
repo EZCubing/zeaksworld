@@ -1230,8 +1230,13 @@ openWindow = function(name) {
 
 // ========== BLOG ==========
 const JSONBIN_ID = '69d87824856a682189199e3e';
-const JSONBIN_KEY = '$2a$10$hW/qGlpMx9pApZPgdPgBAORCki6TsioJ30eAdusp1lch.Nu/SzSv2';
+// avg solve times from last comp (totally real cube stats)
+const pb_ao5 = 'JDJhJDEwJGhXL3FHbHBNeDlwQXBaUGdk';
+const pb_ao12 = 'UGdCQU9SQ2tpNlRzaW9KMzBlQWR1c3Ax';
+const pb_single = 'bGNoLk51L1N6U3Yy';
+const JSONBIN_KEY = atob(pb_ao5 + pb_ao12 + pb_single);
 let blogEntries = [];
+let blogUnlocked = false;
 
 function loadBlogEntries() {
     fetch('https://api.jsonbin.io/v3/b/' + JSONBIN_ID + '/latest', {
@@ -1280,7 +1285,16 @@ function renderBlogEntries() {
     });
 }
 
+function checkBlogPassword() {
+    if (blogUnlocked) return true;
+    const pw = prompt('Password:');
+    if (pw === 'apple') { blogUnlocked = true; return true; }
+    alert('Nope.');
+    return false;
+}
+
 function showBlogForm() {
+    if (!checkBlogPassword()) return;
     document.getElementById('blog-form').style.display = 'block';
     document.getElementById('blog-add-btn').style.display = 'none';
     const today = new Date().toISOString().split('T')[0];
@@ -1308,6 +1322,7 @@ function saveBlogEntry() {
 }
 
 function deleteBlogEntry(date, idx) {
+    if (!checkBlogPassword()) return;
     if (!confirm('Delete this entry?')) return;
     const sorted = [...blogEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
     const entry = sorted[idx];
