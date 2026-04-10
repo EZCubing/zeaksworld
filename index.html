@@ -1229,15 +1229,31 @@ openWindow = function(name) {
 };
 
 // ========== BLOG ==========
+const JSONBIN_ID = '69d87824856a682189199e3e';
+const JSONBIN_KEY = '$2a$10$hW/qGlpMx9pApZPgdPgBAORCki6TsioJ30eAdusp1lch.Nu/SzSv2';
 let blogEntries = [];
 
-function getBlogEntries() {
-    const stored = localStorage.getItem('blogEntries');
-    return stored ? JSON.parse(stored) : null;
+function loadBlogEntries() {
+    fetch('https://api.jsonbin.io/v3/b/' + JSONBIN_ID + '/latest', {
+        headers: { 'X-Master-Key': JSONBIN_KEY }
+    })
+    .then(r => r.json())
+    .then(data => {
+        blogEntries = data.record || [];
+        renderBlogEntries();
+    })
+    .catch(() => renderBlogEntries());
 }
 
-function saveBlogEntries(entries) {
-    localStorage.setItem('blogEntries', JSON.stringify(entries));
+function saveBlogEntries() {
+    return fetch('https://api.jsonbin.io/v3/b/' + JSONBIN_ID, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': JSONBIN_KEY
+        },
+        body: JSON.stringify(blogEntries)
+    });
 }
 
 function renderBlogEntries() {
@@ -1285,9 +1301,10 @@ function saveBlogEntry() {
     const story = document.getElementById('blog-form-story').value.trim();
     if (!date || !story) { alert('Please fill in a date and story.'); return; }
     blogEntries.push({ date: date, title: title || '', story: story });
-    saveBlogEntries(blogEntries);
-    renderBlogEntries();
-    hideBlogForm();
+    saveBlogEntries().then(() => {
+        renderBlogEntries();
+        hideBlogForm();
+    }).catch(() => alert('Failed to save. Try again.'));
 }
 
 function deleteBlogEntry(date, idx) {
@@ -1296,8 +1313,7 @@ function deleteBlogEntry(date, idx) {
     const entry = sorted[idx];
     const origIdx = blogEntries.indexOf(entry);
     if (origIdx > -1) blogEntries.splice(origIdx, 1);
-    saveBlogEntries(blogEntries);
-    renderBlogEntries();
+    saveBlogEntries().then(() => renderBlogEntries());
 }
 
 function exportBlogJSON() {
@@ -1310,21 +1326,7 @@ function exportBlogJSON() {
     a.click();
 }
 
-// Load: use localStorage if available, otherwise seed from JSON file
-const stored = getBlogEntries();
-if (stored) {
-    blogEntries = stored;
-    renderBlogEntries();
-} else {
-    fetch('blog-entries.json')
-        .then(r => r.json())
-        .then(entries => {
-            blogEntries = entries;
-            saveBlogEntries(blogEntries);
-            renderBlogEntries();
-        })
-        .catch(() => renderBlogEntries());
-}
+loadBlogEntries();
 
 </script>
 
