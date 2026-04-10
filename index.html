@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ezekiel Jaramillo</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: Geneva, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color: #333;
+        background: #fff;
+    }
+
+    a { color: #333; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .header {
+        text-align: center;
+        padding: 40px 20px 10px 20px;
+    }
+
+    .header h1 {
+        font-size: 48px;
+        font-weight: bold;
+        color: #807d82;
+        margin-bottom: 4px;
+    }
+
+    .header .subtitle {
+        font-size: 20px;
+        color: #807d82;
+        font-weight: bold;
+    }
+
+    .grid {
+        margin: 30px auto;
+        border-collapse: separate;
+        border-spacing: 20px 30px;
+    }
+
+    .grid td {
+        text-align: center;
+        vertical-align: top;
+        width: 220px;
+    }
+
+    .grid canvas.icon-2d {
+        width: 200px;
+        height: 200px;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        display: block;
+        margin: 0 auto 8px auto;
+    }
+
+    .icon3d-wrap {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto 8px auto;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .icon3d-wrap canvas {
+        width: 200px !important;
+        height: 200px !important;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+    }
+
+    .grid-icon {
+        width: 200px;
+        height: 200px;
+        cursor: pointer;
+        display: block;
+        margin: 0 auto 8px auto;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        object-fit: contain;
+    }
+
+    .grid-icon:hover {
+        opacity: 0.8;
+    }
+
+    .grid a {
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 1.4;
+        display: inline-block;
+        color: #0000FF;
+        text-decoration: underline;
+    }
+
+    .grid a:visited { color: #800080; }
+    .grid a:hover { color: #FF0000; }
+
+    .contact {
+        text-align: center;
+        padding: 30px 20px 60px 20px;
+        color: #807d82;
+        font-size: 14px;
+    }
+
+    .contact b { color: #555; }
+
+    /* Classic Mac Window overlay */
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.15);
+        z-index: 999;
+    }
+
+    .overlay.open { display: block; }
+
+    .window {
+        position: fixed;
+        display: none;
+        flex-direction: column;
+        background: #fff;
+        border: 2px solid #000;
+        box-shadow: 3px 3px 0px rgba(0,0,0,0.25);
+        z-index: 1000;
+    }
+
+    .window.open { display: flex; }
+
+    .window-titlebar {
+        height: 22px;
+        border-bottom: 2px solid #000;
+        display: flex;
+        align-items: center;
+        position: relative;
+        cursor: move;
+        user-select: none;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .window-titlebar::before {
+        content: '';
+        position: absolute;
+        left: 26px; right: 2px; top: 0; bottom: 0;
+        background-image: repeating-linear-gradient(
+            0deg, transparent, transparent 1px,
+            #000 1px, #000 2px,
+            transparent 2px, transparent 3px
+        );
+        background-size: 100% 3px;
+        z-index: 0;
+    }
+
+    .window-title {
+        position: relative;
+        z-index: 1;
+        background: #fff;
+        padding: 0 10px;
+        font-size: 13px;
+        font-weight: bold;
+        text-align: center;
+        margin: 0 auto;
+        white-space: nowrap;
+    }
+
+    .close-box {
+        width: 14px; height: 14px;
+        border: 2px solid #000;
+        background: #fff;
+        position: absolute;
+        left: 5px; top: 3px;
+        z-index: 2;
+        cursor: pointer;
+    }
+
+    .close-box:active { background: #000; }
+
+    .window-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        font-size: 13px;
+        color: #000;
+        line-height: 1.6;
+    }
+
+    .window-body h2 {
+        font-size: 16px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid #000;
+        padding-bottom: 4px;
+    }
+
+    .window-body h3 {
+        font-size: 13px;
+        margin: 16px 0 8px 0;
+    }
+
+    .window-body p { margin-bottom: 10px; }
+    .window-body ul { padding-left: 20px; list-style-type: square; }
+    .window-body li { margin-bottom: 5px; }
+    .window-body a { color: #000; text-decoration: underline; }
+    .window-body a:hover { background: #000; color: #fff; text-decoration: none; }
+
+    .hr { border-top: 1px solid #000; margin: 14px 0; }
+
+    .skill-bar-outer {
+        background: #fff;
+        border: 1px solid #000;
+        width: 160px; height: 12px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .skill-bar-inner { height: 100%; background: #000; }
+
+    .skills-table { border-collapse: collapse; margin-bottom: 12px; }
+    .skills-table td { padding: 5px 10px; border: 1px solid #000; font-size: 12px; }
+    .skills-table tr:first-child { background: #000; color: #fff; }
+
+    .exp-item {
+        padding: 6px 0;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .exp-title { font-weight: bold; }
+
+    .under-construction {
+        text-align: center;
+        padding: 20px;
+        border: 1px dashed #000;
+        margin: 10px 0;
+        font-weight: bold;
+    }
+
+
+    .window-body::-webkit-scrollbar { width: 14px; }
+    .window-body::-webkit-scrollbar-track { background: #fff; border-left: 1px solid #000; }
+    .window-body::-webkit-scrollbar-thumb { background: #ccc; border: 1px solid #000; }
+
+    /* Blog */
+    .blog-entry { border-bottom: 1px solid #000; padding: 12px 0; }
+    .blog-entry:last-child { border-bottom: none; }
+    .blog-date { font-weight: bold; font-size: 12px; margin-bottom: 4px; }
+    .blog-title { font-weight: bold; font-size: 14px; margin-bottom: 6px; }
+    .blog-text { font-size: 13px; line-height: 1.5; }
+    .blog-empty { text-align: center; padding: 30px; color: #888; font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <h1>Ezekiel Jaramillo</h1>
+    <div class="subtitle">Zeak</div>
+</div>
+
+<!-- Grid -->
+<table class="grid" align="center">
+    <tr>
+        <td>
+            <img class="grid-icon" src="about.webp" onclick="openWindow('about')">
+            <a href="#" onclick="openWindow('about');return false">About Me</a>
+        </td>
+        <td>
+            <img class="grid-icon" src="cv.png" onclick="openWindow('resume')">
+            <a href="#" onclick="openWindow('resume');return false">CV</a>
+        </td>
+        <td>
+            <img class="grid-icon" src="hobbies.png" onclick="openWindow('hobbies')">
+            <a href="#" onclick="openWindow('hobbies');return false">Hobbies</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img class="grid-icon" src="projects3.png" onclick="openWindow('projects')">
+            <a href="#" onclick="openWindow('projects');return false">Projects</a>
+        </td>
+        <td>
+            <img class="grid-icon" src="blog.png" onclick="openWindow('blog')">
+            <a href="#" onclick="openWindow('blog');return false">Blog</a>
+        </td>
+        <td>
+            <div class="icon3d-wrap" id="icon3d-cube" onclick="openWindow('cube')"></div>
+            <a href="#" onclick="openWindow('cube');return false">Rubik's Cube</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img class="grid-icon" src="trips.png" onclick="openWindow('trips')">
+            <a href="#" onclick="openWindow('trips');return false">Travel</a>
+        </td>
+        <td>
+            <a href="https://www.youtube.com/@EZCubing" target="_blank"><img class="grid-icon" src="ezcubing.png"></a>
+            <a href="https://www.youtube.com/@EZCubing" target="_blank">EZCubing</a>
+        </td>
+        <td>
+            <img class="grid-icon" src="bike.png" onclick="openWindow('bikes')">
+            <a href="#" onclick="openWindow('bikes');return false">Ruby + Cleanest Bicycles</a>
+        </td>
+    </tr>
+</table>
+
+<!-- Contact -->
+<div class="contact">
+    <b>EzekielJaramillo02 at gmail dot com</b>
+    <br><br>
+    <a href="https://www.linkedin.com/in/ezekiel-jaramillo/" target="_blank">LinkedIn</a>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- About Me Window -->
+<div class="window" id="win-about" style="width:520px;height:380px;top:80px;left:50%;margin-left:-260px;">
+    <div class="window-titlebar" onmousedown="startDrag(event,'win-about')">
+        <div class="close-box" onclick="closeAll()"></div>
+        <span class="window-title">About Me</span>
+    </div>
+    <div class="window-body">
+        <h2>Ezekiel Jaramillo</h2>
+        <p>I'm from Albuquerque, New Mexico. Graduated with an honors degree from the University of Utah.</p>
+    </div>
+</div>
+
+<!-- Resume Window -->
+<div class="window" id="win-resume" style="width:640px;height:580px;top:30px;left:50%;margin-left:-320px;">
+    <div class="window-titlebar" onmousedown="startDrag(event,'win-resume')">
+        <div class="close-box" onclick="closeAll()"></div>
+        <span class="window-title">CV</span>
+    </div>
+    <div class="window-body" style="font-size:12px;">
+        <h2>Ezekiel Jaramillo</h2>
+
+        <h3 style="border-bottom:2px solid #000;padding-bottom:2px;">EDUCATION</h3>
+        <div class="exp-item">
+            <span class="exp-title">University of Utah,</span> Salt Lake City, UT <span style="float:right;font-style:italic;">Expected Grad: May 2026</span><br>
+            <i>Honors B.S. in Computer Science</i> <span style="float:right;font-style:italic;">GPA: 3.7</span>
+        </div>
+
+        <h3 style="border-bottom:2px solid #000;padding-bottom:2px;">EXPERIENCE</h3>
+
+        <div class="exp-item">
+            <span class="exp-title">Boston Consulting Group</span> <span style="float:right;font-style:italic;">Starting Sep 2026</span><br>
+            <i>Incoming Full-Time Associate</i>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">Marvin VC</span> <span style="float:right;font-style:italic;">Aug 2025 - Present</span><br>
+            <i>Venture Capital Intern</i>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">Boston Consulting Group</span> <span style="float:right;font-style:italic;">Jun 2025 - Aug 2025</span><br>
+            <i>Summer Associate</i>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">Harvard SVMP</span> <span style="float:right;font-style:italic;">2025</span><br>
+            <i>Summer Venture in Management Program</i>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">Bridge to Consulting</span><br>
+            <i>Program Participant</i>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">L3Harris Technologies</span> <span style="float:right;font-style:italic;">Aug 2024 - May 2025</span><br>
+            <i>Part-time Software Engineer Intern</i>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">Lockheed Martin</span> <span style="float:right;font-style:italic;">Jun 2024 - Aug 2024</span><br>
+            <i>Quality Engineer Intern</i>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">L3Harris Technologies</span> <span style="float:right;font-style:italic;">Feb 2024 - May 2024</span><br>
+            <i>Part-time Software Engineer Intern</i>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">L3Harris Technologies</span> <span style="float:right;font-style:italic;">May 2023 - Aug 2023</span><br>
+            <i>Software Engineer Intern</i>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">Apple</span> <span style="float:right;font-style:italic;">Nov 2021 - Feb 2024</span><br>
+            <i>Sales Specialist</i>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">DoorDash</span> <span style="float:right;font-style:italic;">High School</span><br>
+            <i>Delivery Driver</i>
+        </div>
+
+        <h3 style="border-bottom:2px solid #000;padding-bottom:2px;">LEADERSHIP</h3>
+
+        <div class="exp-item">
+            <span class="exp-title">SHPE</span> &mdash; Region Three Student Representative <span style="float:right;font-style:italic;">Jul 2025 - Present</span>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">University of Utah ColorStack</span> &mdash; President <span style="float:right;font-style:italic;">May 2025 - Present</span>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">Management Consulting Club</span> &mdash; President <span style="float:right;font-style:italic;">Jan 2025 - Dec 2025</span>
+        </div>
+
+        <div class="exp-item">
+            <span class="exp-title">SHPE</span> &mdash; President <span style="float:right;font-style:italic;">Apr 2024 - May 2025</span>
+        </div>
+
+        <h3 style="border-bottom:2px solid #000;padding-bottom:2px;">INTERESTS</h3>
+        <div class="exp-item" style="border-bottom:none;">
+            <b>Cubing:</b> Able to solve a Rubik's cube in under 7 seconds<br>
+            <b>Languages:</b> Java, C#, C++, C, HTML, CSS<br>
+            <b>Soft Skills:</b> Talked to thousands of customers at Apple, sometimes in Spanish
+        </div>
+    </div>
+</div>
+
+<!-- Ruby + Cleanest Bicycles Window -->
+<div class="window" id="win-bikes" style="width:460px;height:320px;top:80px;left:50%;margin-left:-230px;">
+    <div class="window-titlebar" onmousedown="startDrag(event,'win-bikes')">
+        <div class="close-box" onclick="closeAll()"></div>
+        <span class="window-title">Ruby + Cleanest Bicycles</span>
+    </div>
+    <div class="window-body">
+        <h2>Ruby + Cleanest Bicycles</h2>
+        <div class="under-construction">
+            [!] UNDER CONSTRUCTION [!]<br>
+            (Content coming soon.)
+        </div>
+    </div>
+</div>
+
+<!-- Favorite Trips Window -->
+<div class="window" id="win-trips" style="width:460px;height:320px;top:80px;left:50%;margin-left:-230px;">
+    <div class="window-titlebar" onmousedown="startDrag(event,'win-trips')">
+        <div class="close-box" onclick="closeAll()"></div>
+        <span class="window-title">Travel</span>
+    </div>
+    <div class="window-body">
+        <h2>Travel</h2>
+        <div class="under-construction">
+            [!] UNDER CONSTRUCTION [!]<br>
+            (Photos loading... film is still developing.)
+        </div>
+    </div>
+</div>
+
+<!-- Hobbies Window -->
+<div class="window" id="win-hobbies" style="width:420px;height:300px;top:100px;left:50%;margin-left:-210px;">
+    <div class="window-titlebar" onmousedown="startDrag(event,'win-hobbies')">
+        <div class="close-box" onclick="closeAll()"></div>
+        <span class="window-title">Hobbies</span>
+    </div>
+    <div class="window-body">
+        <h2>Hobbies</h2>
+        <ul>
+            <li>Fixie bikes</li>
+            <li>Laughing</li>
+            <li>Skiing</li>
+            <li>Rock climbing</li>
+            <li>Great weather</li>
+            <li>Hackey Sacking</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Projects Window -->
+<div class="window" id="win-projects" style="width:460px;height:320px;top:80px;left:50%;margin-left:-230px;">
+    <div class="window-titlebar" onmousedown="startDrag(event,'win-projects')">
+        <div class="close-box" onclick="closeAll()"></div>
+        <span class="window-title">Projects</span>
+    </div>
+    <div class="window-body">
+        <h2>Projects</h2>
+        <ul>
+            <li><a href="https://jointhereadingclub.com" target="_blank">JoinTheReadingClub.com</a></li>
+            <li>Venture Capital Dashboard Tool</li>
+            <li>Albuquerque Spring 2016</li>
+            <li>EZCubing</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Blog Window -->
+<div class="window" id="win-blog" style="width:520px;height:460px;top:60px;left:50%;margin-left:-260px;">
+    <div class="window-titlebar" onmousedown="startDrag(event,'win-blog')">
+        <div class="close-box" onclick="closeAll()"></div>
+        <span class="window-title">Blog</span>
+    </div>
+    <div class="window-body" id="blog-body">
+        <h2>Daily Blog</h2>
+        <div id="blog-toolbar" style="margin-bottom:12px;">
+            <button onclick="showBlogForm()" id="blog-add-btn" style="font-family:inherit;padding:4px 12px;border:1px solid #000;background:#fff;cursor:pointer;">+ New Entry</button>
+            <button onclick="exportBlogJSON()" style="font-family:inherit;padding:4px 12px;border:1px solid #000;background:#fff;cursor:pointer;margin-left:4px;">Export JSON</button>
+        </div>
+        <div id="blog-form" style="display:none;border:1px solid #000;padding:12px;margin-bottom:12px;">
+            <div style="margin-bottom:8px;">
+                <label style="font-weight:bold;font-size:12px;">Date</label><br>
+                <input type="date" id="blog-form-date" style="font-family:inherit;font-size:13px;padding:3px 6px;border:1px solid #000;width:100%;">
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="font-weight:bold;font-size:12px;">Title (optional)</label><br>
+                <input type="text" id="blog-form-title" placeholder="What happened today?" style="font-family:inherit;font-size:13px;padding:3px 6px;border:1px solid #000;width:100%;">
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="font-weight:bold;font-size:12px;">Story</label><br>
+                <textarea id="blog-form-story" rows="5" placeholder="Tell the story..." style="font-family:inherit;font-size:13px;padding:6px;border:1px solid #000;width:100%;resize:vertical;"></textarea>
+            </div>
+            <button onclick="saveBlogEntry()" style="font-family:inherit;padding:4px 14px;border:1px solid #000;background:#000;color:#fff;cursor:pointer;">Save</button>
+            <button onclick="hideBlogForm()" style="font-family:inherit;padding:4px 14px;border:1px solid #000;background:#fff;cursor:pointer;margin-left:4px;">Cancel</button>
+        </div>
+        <div id="blog-entries"></div>
+    </div>
+</div>
+
+<!-- Rubik's Cube Window -->
+<div class="window" id="win-cube" style="width:420px;height:480px;top:50px;left:50%;margin-left:-210px;">
+    <div class="window-titlebar" onmousedown="startDrag(event,'win-cube')">
+        <div class="close-box" onclick="closeAll()"></div>
+        <span class="window-title">Rubik's Cube</span>
+    </div>
+    <div class="window-body" style="padding:0;overflow:hidden;position:relative;">
+        <div id="cube-container" style="width:100%;height:100%;"></div>
+        <div style="position:absolute;bottom:10px;left:0;right:0;text-align:center;">
+            <button onclick="scrambleCube3D()" style="font-family:inherit;padding:6px 16px;border:1px solid #000;background:#fff;cursor:pointer;margin:0 4px;">Scramble</button>
+            <button onclick="resetCube3D()" style="font-family:inherit;padding:6px 16px;border:1px solid #000;background:#fff;cursor:pointer;margin:0 4px;">Reset</button>
+        </div>
+        <div style="position:absolute;top:8px;left:10px;font-size:10px;color:#888;">Drag to orbit. Click a face to rotate it.</div>
+    </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// ========== WINDOWS ==========
+let topZ = 1000;
+
+function openWindow(name) {
+    document.getElementById('overlay').classList.add('open');
+    const win = document.getElementById('win-' + name);
+    win.classList.add('open');
+    topZ++;
+    win.style.zIndex = topZ;
+}
+
+function closeAll() {
+    document.querySelectorAll('.window').forEach(w => w.classList.remove('open'));
+    document.getElementById('overlay').classList.remove('open');
+}
+
+// Dragging
+let dragWin = null, dx = 0, dy = 0;
+function startDrag(e, id) {
+    dragWin = document.getElementById(id);
+    topZ++; dragWin.style.zIndex = topZ;
+    const r = dragWin.getBoundingClientRect();
+    dx = e.clientX - r.left; dy = e.clientY - r.top;
+    e.preventDefault();
+}
+document.addEventListener('mousemove', e => {
+    if (!dragWin) return;
+    dragWin.style.left = (e.clientX - dx) + 'px';
+    dragWin.style.top = (e.clientY - dy) + 'px';
+    dragWin.style.marginLeft = '0';
+});
+document.addEventListener('mouseup', () => { dragWin = null; });
+
+// ========== 3D SPINNING ICONS ==========
+const RES = 48; // render resolution - crunchy pixelated
+const icon3dScenes = [];
+
+function pixelsToTexture(pixels, palette) {
+    const s = pixels.length;
+    const offscreen = document.createElement('canvas');
+    offscreen.width = s; offscreen.height = s;
+    const ctx = offscreen.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, s, s);
+    for (let y = 0; y < s; y++)
+        for (let x = 0; x < pixels[y].length; x++) {
+            const ch = pixels[y][x];
+            if (ch !== '.' && palette[ch]) {
+                ctx.fillStyle = palette[ch];
+                ctx.fillRect(x, y, 1, 1);
+            }
+        }
+    const tex = new THREE.CanvasTexture(offscreen);
+    tex.magFilter = THREE.NearestFilter;
+    tex.minFilter = THREE.NearestFilter;
+    return tex;
+}
+
+function create3DIcon(containerId, pixels, palette, shape) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
+    camera.position.set(0, 0, 4);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: false });
+    renderer.setSize(RES, RES);
+    renderer.setPixelRatio(1);
+    container.appendChild(renderer.domElement);
+
+    const tex = pixelsToTexture(pixels, palette);
+    let mesh;
+
+    if (shape === 'cube') {
+        const geo = new THREE.BoxGeometry(1.8, 1.8, 1.8);
+        const mat = new THREE.MeshLambertMaterial({ map: tex });
+        mesh = new THREE.Mesh(geo, [mat, mat, mat, mat, mat, mat]);
+    } else if (shape === 'cylinder') {
+        const geo = new THREE.CylinderGeometry(1, 1, 0.3, 16);
+        const sideMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
+        const capMat = new THREE.MeshLambertMaterial({ map: tex });
+        mesh = new THREE.Mesh(geo, [sideMat, capMat, capMat]);
+        mesh.rotation.x = 0.4;
+    } else {
+        // flat card
+        const geo = new THREE.BoxGeometry(1.8, 1.8, 0.15);
+        const frontMat = new THREE.MeshLambertMaterial({ map: tex });
+        const sideMat = new THREE.MeshLambertMaterial({ color: 0x222222 });
+        mesh = new THREE.Mesh(geo, [sideMat, sideMat, sideMat, sideMat, frontMat, frontMat]);
+    }
+
+    scene.add(mesh);
+
+    const light = new THREE.DirectionalLight(0xffffff, 0.9);
+    light.position.set(3, 4, 5);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+    icon3dScenes.push({ scene, camera, renderer, mesh, speed: 0.008 + Math.random() * 0.004 });
+}
+
+// Real 3D Rubik's cube icon
+function createRubikIcon(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+    camera.position.set(4.5, 3.5, 4.5);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: false });
+    renderer.setSize(RES, RES);
+    renderer.setPixelRatio(1);
+    container.appendChild(renderer.domElement);
+
+    const COLORS = [0xdd0000, 0xee8800, 0xffffff, 0xdddd00, 0x0044dd, 0x00aa00];
+    const group = new THREE.Group();
+    const gap = 0.08;
+    const size = 0.85;
+
+    for (let x = -1; x <= 1; x++) {
+        for (let y = -1; y <= 1; y++) {
+            for (let z = -1; z <= 1; z++) {
+                const mats = [
+                    new THREE.MeshLambertMaterial({ color: x === 1 ? COLORS[0] : 0x111111 }),
+                    new THREE.MeshLambertMaterial({ color: x === -1 ? COLORS[1] : 0x111111 }),
+                    new THREE.MeshLambertMaterial({ color: y === 1 ? COLORS[2] : 0x111111 }),
+                    new THREE.MeshLambertMaterial({ color: y === -1 ? COLORS[3] : 0x111111 }),
+                    new THREE.MeshLambertMaterial({ color: z === 1 ? COLORS[4] : 0x111111 }),
+                    new THREE.MeshLambertMaterial({ color: z === -1 ? COLORS[5] : 0x111111 }),
+                ];
+                const geo = new THREE.BoxGeometry(size, size, size);
+                const mesh = new THREE.Mesh(geo, mats);
+                mesh.position.set(x * (1 + gap), y * (1 + gap), z * (1 + gap));
+                group.add(mesh);
+            }
+        }
+    }
+
+    scene.add(group);
+
+    const light = new THREE.DirectionalLight(0xffffff, 0.9);
+    light.position.set(5, 8, 6);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+
+    icon3dScenes.push({ scene, camera, renderer, mesh: group, speed: 0.006 });
+}
+
+// 3D spinning globe icon
+function createGlobeIcon(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+    camera.position.set(0, 0, 4.5);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: false });
+    renderer.setSize(RES, RES);
+    renderer.setPixelRatio(1);
+    container.appendChild(renderer.domElement);
+
+    const group = new THREE.Group();
+
+    // Ocean sphere
+    const sphereGeo = new THREE.SphereGeometry(1.3, 12, 8);
+    const oceanMat = new THREE.MeshLambertMaterial({ color: 0x1144aa });
+    group.add(new THREE.Mesh(sphereGeo, oceanMat));
+
+    // Land masses from icosahedron faces
+    const icoGeo = new THREE.IcosahedronGeometry(1.32, 1);
+    const posAttr = icoGeo.attributes.position;
+    const faceCount = posAttr.count / 3;
+    const landColor = new THREE.Color(0x33aa44);
+    const desertColor = new THREE.Color(0xccaa55);
+    const landPositions = [];
+    const landColors = [];
+
+    for (let i = 0; i < faceCount; i++) {
+        const arr = posAttr.array;
+        const cx = (arr[i*9] + arr[i*9+3] + arr[i*9+6]) / 3;
+        const cy = (arr[i*9+1] + arr[i*9+4] + arr[i*9+7]) / 3;
+        const cz = (arr[i*9+2] + arr[i*9+5] + arr[i*9+8]) / 3;
+        const r = Math.sqrt(cx*cx + cy*cy + cz*cz);
+        const lat = Math.asin(cy / r);
+        const lon = Math.atan2(cz, cx);
+
+        let isLand = false;
+        if (lat > 0.3 && lat < 1.2 && lon > 1.5 && lon < 2.8) isLand = true;
+        if (lat > -0.9 && lat < 0.1 && lon > 1.8 && lon < 2.5) isLand = true;
+        if (lat > -0.6 && lat < 0.9 && lon > -0.5 && lon < 0.6) isLand = true;
+        if (lat > 0.2 && lat < 1.1 && lon > 0.5 && lon < 1.8) isLand = true;
+        if (lat > -0.8 && lat < -0.2 && lon > 0.8 && lon < 1.6) isLand = true;
+        if (lat > -0.7 && lat < -0.1 && lon > -0.2 && lon < 0.5) isLand = true;
+
+        if (isLand) {
+            for (let v = 0; v < 3; v++) {
+                landPositions.push(arr[i*9+v*3], arr[i*9+v*3+1], arr[i*9+v*3+2]);
+                const c = Math.abs(lat) < 0.35 ? desertColor : landColor;
+                landColors.push(c.r, c.g, c.b);
+            }
+        }
+    }
+
+    const landGeo = new THREE.BufferGeometry();
+    landGeo.setAttribute('position', new THREE.Float32BufferAttribute(landPositions, 3));
+    landGeo.setAttribute('color', new THREE.Float32BufferAttribute(landColors, 3));
+    landGeo.computeVertexNormals();
+    group.add(new THREE.Mesh(landGeo, new THREE.MeshLambertMaterial({ vertexColors: true })));
+
+    // Wireframe overlay for retro look
+    const wireGeo = new THREE.SphereGeometry(1.33, 16, 10);
+    const wireMat = new THREE.MeshBasicMaterial({ color: 0x88ccff, wireframe: true, transparent: true, opacity: 0.35 });
+    group.add(new THREE.Mesh(wireGeo, wireMat));
+
+    group.rotation.z = 0.2;
+    group.rotation.x = 0.15;
+    scene.add(group);
+
+    const light = new THREE.DirectionalLight(0xffffff, 0.85);
+    light.position.set(4, 5, 6);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+    icon3dScenes.push({ scene, camera, renderer, mesh: group, speed: 0.007 });
+}
+
+function animateIcons() {
+    requestAnimationFrame(animateIcons);
+    icon3dScenes.forEach(s => {
+        s.mesh.rotation.y += s.speed;
+        s.renderer.render(s.scene, s.camera);
+    });
+}
+
+// Helper to still draw 2D for reference
+function drawIcon(id, pixels, palette) {
+    const c = document.getElementById(id);
+    if (!c) return;
+    const s = pixels.length;
+    c.width = s; c.height = s;
+    c.style.imageRendering = 'pixelated';
+    const ctx = c.getContext('2d');
+    for (let y = 0; y < s; y++)
+        for (let x = 0; x < pixels[y].length; x++) {
+            const ch = pixels[y][x];
+            if (ch !== '.' && palette[ch]) {
+                ctx.fillStyle = palette[ch];
+                ctx.fillRect(x, y, 1, 1);
+            }
+        }
+}
+
+const BW = { '#': '#000', 'w': '#fff' };
+
+const BIKE = [
+    '................................',
+    '................................',
+    '....................####........',
+    '...................##..##.......',
+    '....................####........',
+    '.....................##.........',
+    '....................##..........',
+    '...................##...........',
+    '..........##.....##............',
+    '.........####...##.............',
+    '........##..##.##..............',
+    '.......##...####...............',
+    '......##...##..##..............',
+    '.....##...##....##.............',
+    '.....#...##......##............',
+    '.....#..##........##...........',
+    '.....#.##..........##..........',
+    '.....###............#..........',
+    '......##............##.........',
+    '.....##..............##........',
+    '....####..............####.....',
+    '...##..##....####...##..##....',
+    '..##....##..##..##.##....##...',
+    '.##......####....####.....##..',
+    '.#......##..........##.....#..',
+    '.#.....##............##....#..',
+    '.##...##..............##..##..',
+    '..##..##..............##.##...',
+    '...####................####...',
+    '....##..................##....',
+    '................................',
+    '................................',
+];
+
+const RESUME = [
+    '................................',
+    '......################..........',
+    '......#..............###........',
+    '......#..............#.##.......',
+    '......#..............####.......',
+    '......#....................#.....',
+    '......#...##########.....#.....',
+    '......#....................#.....',
+    '......#...############...#.....',
+    '......#....................#.....',
+    '......#...##########.....#.....',
+    '......#....................#.....',
+    '......#...############...#.....',
+    '......#....................#.....',
+    '......#...########.......#.....',
+    '......#....................#.....',
+    '......#...############...#.....',
+    '......#....................#.....',
+    '......#...##########.....#.....',
+    '......#....................#.....',
+    '......#....................#.....',
+    '......#####################.....',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+];
+
+const MOUNTAIN = [
+    '................................',
+    '...........###..................',
+    '..........#www#.................',
+    '..........#www#.................',
+    '...........###..................',
+    '................................',
+    '................#...............',
+    '...............###..............',
+    '..............##.##.............',
+    '.............##...##............',
+    '............##.....##...........',
+    '...........##..#.#..##..........',
+    '..........##..#...#..##.........',
+    '.........##..##...##..##........',
+    '........##.###.....###.##.......',
+    '.......##.##.........##.##.....',
+    '......####...........#####.....',
+    '.....##...................##....',
+    '....##.....................##...',
+    '...##.......................##..',
+    '..#############################',
+    '..#############################',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+];
+
+const FOLDER = [
+    '................................',
+    '................................',
+    '...########.....................',
+    '..##......##....................',
+    '.##........####################.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.#............................#.',
+    '.##############################.',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+];
+
+const NOTEPAD = [
+    '................................',
+    '................................',
+    '...........########.............',
+    '.........##........##...........',
+    '.......##....##......##.........',
+    '......#....####..##...#.........',
+    '.....#....####...###...#........',
+    '....#....####.....###..#.......',
+    '...#.....###......####..#......',
+    '...#.....##.......####..#......',
+    '..#......##........###...#.....',
+    '..#...............####...#.....',
+    '..#..............####....#.....',
+    '..#.....##......####.....#.....',
+    '..#....####....####......#.....',
+    '...#...####...####......#......',
+    '...#...####..####.......#......',
+    '....#..###...###........#......',
+    '.....#..##..............#.......',
+    '......#................#........',
+    '.......##............##.........',
+    '.........##........##...........',
+    '...........########.............',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+];
+
+const RUBIK = [
+    '................................',
+    '....########################....',
+    '....########################....',
+    '....##RRRRRR##BBBBBB##GGGGGG##..',
+    '....##RRRRRR##BBBBBB##GGGGGG##..',
+    '....##RRRRRR##BBBBBB##GGGGGG##..',
+    '....##RRRRRR##BBBBBB##GGGGGG##..',
+    '....##RRRRRR##BBBBBB##GGGGGG##..',
+    '....##RRRRRR##BBBBBB##GGGGGG##..',
+    '....########################....',
+    '....########################....',
+    '....##WWWWWW##OOOOOO##YYYYYY##..',
+    '....##WWWWWW##OOOOOO##YYYYYY##..',
+    '....##WWWWWW##OOOOOO##YYYYYY##..',
+    '....##WWWWWW##OOOOOO##YYYYYY##..',
+    '....##WWWWWW##OOOOOO##YYYYYY##..',
+    '....##WWWWWW##OOOOOO##YYYYYY##..',
+    '....########################....',
+    '....########################....',
+    '....##BBBBBB##RRRRRR##WWWWWW##..',
+    '....##BBBBBB##RRRRRR##WWWWWW##..',
+    '....##BBBBBB##RRRRRR##WWWWWW##..',
+    '....##BBBBBB##RRRRRR##WWWWWW##..',
+    '....##BBBBBB##RRRRRR##WWWWWW##..',
+    '....##BBBBBB##RRRRRR##WWWWWW##..',
+    '....########################....',
+    '....########################....',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+    '................................',
+];
+
+const CP = {
+    '#': '#000', 'R': '#dd0000', 'G': '#00aa00',
+    'B': '#0044dd', 'W': '#ffffff', 'Y': '#dddd00', 'O': '#ee8800',
+};
+
+// Create the 3D spinning icons
+createRubikIcon('icon3d-cube');
+
+animateIcons();
+
+
+// ========== 3D RUBIK'S CUBE ==========
+// Loaded dynamically when window opens
+let cubeScene, cubeCamera, cubeRenderer, cubeControls;
+let cubePieces = [];
+let cubeInited = false;
+let cubeAnimating = false;
+
+// Face colors: R, L, U, D, F, B
+const FACE_COLORS = [0xdd0000, 0xee8800, 0xffffff, 0xdddd00, 0x0044dd, 0x00aa00];
+// axis directions for each face
+const FACE_AXES = ['x','x','y','y','z','z'];
+const FACE_DIRS = [1,-1,1,-1,1,-1];
+
+function initCube3D() {
+    if (cubeInited) return;
+    cubeInited = true;
+
+    const container = document.getElementById('cube-container');
+    const W = container.clientWidth, H = container.clientHeight;
+
+    cubeScene = new THREE.Scene();
+    cubeScene.background = new THREE.Color(0xffffff);
+
+    cubeCamera = new THREE.PerspectiveCamera(40, W/H, 0.1, 100);
+    cubeCamera.position.set(5, 4, 5);
+
+    cubeRenderer = new THREE.WebGLRenderer({ antialias: true });
+    cubeRenderer.setSize(W, H);
+    cubeRenderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(cubeRenderer.domElement);
+
+    cubeControls = new THREE.OrbitControls(cubeCamera, cubeRenderer.domElement);
+    cubeControls.enablePan = false;
+    cubeControls.enableZoom = false;
+    cubeControls.dampingFactor = 0.1;
+
+    const light = new THREE.DirectionalLight(0xffffff, 0.8);
+    light.position.set(5, 10, 7);
+    cubeScene.add(light);
+    cubeScene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+    buildCube3D();
+
+    // Raycaster for clicking faces
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let mouseDown = new THREE.Vector2();
+
+    cubeRenderer.domElement.addEventListener('mousedown', (e) => {
+        mouseDown.x = e.clientX;
+        mouseDown.y = e.clientY;
+    });
+
+    cubeRenderer.domElement.addEventListener('mouseup', (e) => {
+        const dist = Math.hypot(e.clientX - mouseDown.x, e.clientY - mouseDown.y);
+        if (dist > 5 || cubeAnimating) return; // was a drag, not a click
+
+        const rect = cubeRenderer.domElement.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left)/rect.width)*2-1;
+        mouse.y = -((e.clientY - rect.top)/rect.height)*2+1;
+        raycaster.setFromCamera(mouse, cubeCamera);
+
+        const hits = raycaster.intersectObjects(cubePieces, true);
+        if (hits.length > 0) {
+            const normal = hits[0].face.normal.clone();
+            normal.transformDirection(hits[0].object.matrixWorld);
+            // Determine which face was clicked
+            const absN = [Math.abs(normal.x), Math.abs(normal.y), Math.abs(normal.z)];
+            const maxI = absN.indexOf(Math.max(...absN));
+            const axes = ['x','y','z'];
+            const axis = axes[maxI];
+            const piece = hits[0].object.parent;
+            const layerVal = Math.round(piece.position[axis]);
+            rotateFace(axis, layerVal, Math.PI/2);
+        }
+    });
+
+    animateCube3D();
+}
+
+function buildCube3D() {
+    // Remove old pieces
+    cubePieces.forEach(p => cubeScene.remove(p));
+    cubePieces = [];
+
+    const gap = 0.06;
+    const size = 0.9;
+
+    for (let x = -1; x <= 1; x++) {
+        for (let y = -1; y <= 1; y++) {
+            for (let z = -1; z <= 1; z++) {
+                const group = new THREE.Group();
+                group.position.set(x * (1 + gap), y * (1 + gap), z * (1 + gap));
+
+                // Create materials for each face: +x,-x,+y,-y,+z,-z
+                const mats = [];
+                mats.push(new THREE.MeshLambertMaterial({ color: x===1 ? FACE_COLORS[0] : 0x111111 }));
+                mats.push(new THREE.MeshLambertMaterial({ color: x===-1 ? FACE_COLORS[1] : 0x111111 }));
+                mats.push(new THREE.MeshLambertMaterial({ color: y===1 ? FACE_COLORS[2] : 0x111111 }));
+                mats.push(new THREE.MeshLambertMaterial({ color: y===-1 ? FACE_COLORS[3] : 0x111111 }));
+                mats.push(new THREE.MeshLambertMaterial({ color: z===1 ? FACE_COLORS[4] : 0x111111 }));
+                mats.push(new THREE.MeshLambertMaterial({ color: z===-1 ? FACE_COLORS[5] : 0x111111 }));
+
+                const geo = new THREE.BoxGeometry(size, size, size);
+                const mesh = new THREE.Mesh(geo, mats);
+                group.add(mesh);
+
+                cubeScene.add(group);
+                cubePieces.push(group);
+            }
+        }
+    }
+}
+
+function rotateFace(axis, layerVal, angle) {
+    if (cubeAnimating) return;
+    cubeAnimating = true;
+
+    const affected = cubePieces.filter(p => Math.round(p.position[axis]) === layerVal);
+    const pivot = new THREE.Group();
+    cubeScene.add(pivot);
+    affected.forEach(p => pivot.attach(p));
+
+    const target = { val: 0 };
+    const total = angle;
+    const duration = 300;
+    const start = performance.now();
+
+    function step(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+        const newVal = total * ease;
+        const delta = newVal - target.val;
+        target.val = newVal;
+
+        if (axis === 'x') pivot.rotateX(delta);
+        if (axis === 'y') pivot.rotateY(delta);
+        if (axis === 'z') pivot.rotateZ(delta);
+
+        if (t < 1) {
+            requestAnimationFrame(step);
+        } else {
+            // Detach pieces back to scene
+            affected.forEach(p => {
+                cubeScene.attach(p);
+                // Round positions to avoid drift
+                p.position.x = Math.round(p.position.x);
+                p.position.y = Math.round(p.position.y);
+                p.position.z = Math.round(p.position.z);
+            });
+            cubeScene.remove(pivot);
+            cubeAnimating = false;
+        }
+    }
+    requestAnimationFrame(step);
+}
+
+function scrambleCube3D() {
+    if (!cubeInited) return;
+    const axes = ['x','y','z'];
+    const layers = [-1, 0, 1];
+    let i = 0;
+    function doMove() {
+        if (i >= 20) return;
+        const axis = axes[Math.floor(Math.random()*3)];
+        const layer = layers[Math.floor(Math.random()*3)];
+        const dir = Math.random() < 0.5 ? 1 : -1;
+        rotateFace(axis, layer, dir * Math.PI/2);
+        i++;
+        setTimeout(doMove, 350);
+    }
+    doMove();
+}
+
+function resetCube3D() {
+    if (!cubeInited || cubeAnimating) return;
+    buildCube3D();
+}
+
+function animateCube3D() {
+    requestAnimationFrame(animateCube3D);
+    if (cubeControls) cubeControls.update();
+    if (cubeRenderer && cubeScene && cubeCamera) {
+        cubeRenderer.render(cubeScene, cubeCamera);
+    }
+}
+
+// Init cube when window opens
+const origOpen = openWindow;
+openWindow = function(name) {
+    origOpen(name);
+    if (name === 'cube') {
+        setTimeout(initCube3D, 50);
+    }
+};
+
+// ========== BLOG ==========
+let blogEntries = [];
+
+function getBlogEntries() {
+    const stored = localStorage.getItem('blogEntries');
+    return stored ? JSON.parse(stored) : null;
+}
+
+function saveBlogEntries(entries) {
+    localStorage.setItem('blogEntries', JSON.stringify(entries));
+}
+
+function renderBlogEntries() {
+    const container = document.getElementById('blog-entries');
+    container.innerHTML = '';
+    if (!blogEntries.length) {
+        container.innerHTML = '<div class="blog-empty">No entries yet. Click "+ New Entry" to start writing.</div>';
+        return;
+    }
+    const sorted = [...blogEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+    sorted.forEach((e, i) => {
+        const div = document.createElement('div');
+        div.className = 'blog-entry';
+        const d = new Date(e.date + 'T00:00:00');
+        const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const escTitle = e.title ? e.title.replace(/</g, '&lt;') : '';
+        const escStory = e.story.replace(/</g, '&lt;').replace(/\n/g, '<br>');
+        div.innerHTML =
+            '<div class="blog-date">' + dateStr +
+            ' <a href="#" onclick="deleteBlogEntry(\'' + e.date + '\',\'' + i + '\');return false;" style="font-size:11px;color:#888;">[delete]</a></div>' +
+            (escTitle ? '<div class="blog-title">' + escTitle + '</div>' : '') +
+            '<div class="blog-text">' + escStory + '</div>';
+        container.appendChild(div);
+    });
+}
+
+function showBlogForm() {
+    document.getElementById('blog-form').style.display = 'block';
+    document.getElementById('blog-add-btn').style.display = 'none';
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('blog-form-date').value = today;
+    document.getElementById('blog-form-title').value = '';
+    document.getElementById('blog-form-story').value = '';
+    document.getElementById('blog-form-story').focus();
+}
+
+function hideBlogForm() {
+    document.getElementById('blog-form').style.display = 'none';
+    document.getElementById('blog-add-btn').style.display = '';
+}
+
+function saveBlogEntry() {
+    const date = document.getElementById('blog-form-date').value;
+    const title = document.getElementById('blog-form-title').value.trim();
+    const story = document.getElementById('blog-form-story').value.trim();
+    if (!date || !story) { alert('Please fill in a date and story.'); return; }
+    blogEntries.push({ date: date, title: title || '', story: story });
+    saveBlogEntries(blogEntries);
+    renderBlogEntries();
+    hideBlogForm();
+}
+
+function deleteBlogEntry(date, idx) {
+    if (!confirm('Delete this entry?')) return;
+    const sorted = [...blogEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const entry = sorted[idx];
+    const origIdx = blogEntries.indexOf(entry);
+    if (origIdx > -1) blogEntries.splice(origIdx, 1);
+    saveBlogEntries(blogEntries);
+    renderBlogEntries();
+}
+
+function exportBlogJSON() {
+    const sorted = [...blogEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const json = JSON.stringify(sorted, null, 4) + '\n';
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'blog-entries.json';
+    a.click();
+}
+
+// Load: use localStorage if available, otherwise seed from JSON file
+const stored = getBlogEntries();
+if (stored) {
+    blogEntries = stored;
+    renderBlogEntries();
+} else {
+    fetch('blog-entries.json')
+        .then(r => r.json())
+        .then(entries => {
+            blogEntries = entries;
+            saveBlogEntries(blogEntries);
+            renderBlogEntries();
+        })
+        .catch(() => renderBlogEntries());
+}
+
+</script>
+
+</body>
+</html>
